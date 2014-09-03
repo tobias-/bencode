@@ -125,7 +125,7 @@ public class Bdecoder {
 	}
 
 	protected Map decodeDic(byte[] bencodedData, MutableInt pos) throws IOException {
-		Map result = new LinkedHashMap();
+		Map<Object, Object> result = new LinkedHashMap<Object, Object>();
 		//byte[] last = new byte[0];
 		Object temp;
 		Object temp2;
@@ -146,7 +146,7 @@ public class Bdecoder {
 	}
 
 	protected List decodeList(byte[] bencodedData, MutableInt pos) throws IOException {
-		List result = new LinkedList();
+		List<Object> result = new LinkedList<Object>();
 		pos.pos++;
 		while (pos.pos < bencodedData.length && bencodedData[pos.pos] != END) {
 			result.add(decode(bencodedData, pos));
