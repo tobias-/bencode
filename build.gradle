@@ -1,0 +1,107 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply from: 'http://tellurianring.com/projects/gradle-plugins/gradle-release/apply.groovy'
+
+
+group = 'be.olsson.bencoder'
+
+ext.isReleaseVersion = !version.endsWith("-SNAPSHOT")
+
+description = "Small library to decode and encode bencoded data"
+
+targetCompatibility = "1.5"
+sourceCompatibility = "1.5"
+
+task sourcesJar(type: Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn:javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+    }
+}
+
+signing {
+	sign configurations.archives
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+uploadArchives {
+	repositories.mavenDeployer {
+		pom.artifactId = 'bencoder'
+		configuration = configurations.archives
+
+		if (isReleaseVersion) {
+			repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: nexusUsername, password: nexusPassword)
+			}
+		} else {
+        	repository(url: "file://localhost/tmp/myRepo/")
+		}
+
+		pom.project {
+			url 'http://github.com/tobias-/bencode'
+			inceptionYear '2003'
+			name 'Bencoder'
+			description project.description
+
+			scm {
+				url 'scm:git:https://github.com/tobias-/bencode.git'
+				connection 'scm:git:ssh://git@github.com/tobias-/bencode.git'
+			}
+
+			licenses {
+				license {
+					name 'Unlicense'
+					comments new File('UNLICENSE').getText()
+					url 'http://unlicense.org/'
+					distribution 'repo'
+				}
+			}
+			developers {
+				developer {
+					id 'tobias-'
+					name 'Tobias Olsson'
+					email 'tobias@olsson.be'
+				}
+			}
+		}
+		pom.withXml { root ->
+			def children = root.asNode().children()
+			def versionIndex = children.indexOf(children.find {it.name().localPart == 'version'})
+			children.add(versionIndex + 1, new Node(null, 'packaging', 'jar'))
+		}
+		pom.packaging = 'jar'
+		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+	}
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+		def password = System.console().readPassword("PGP Private Key Password: ")
+		allprojects { ext."signing.password" = password }
+		allprojects { ext."signing.keyId" = "A043AF3C" }
+		allprojects { ext."signing.secretKeyRingFile" = System.env.HOME + "/.gnupg/secring.gpg" }
+	}
+}
