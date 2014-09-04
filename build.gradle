@@ -36,10 +36,6 @@ sourceSets {
     }
 }
 
-task confirmReleaseVersion << {
-	println "confirmReleaseVersion: ${version}"
-}
-
 release {
 	tagPrefix = 'bencoder'
 }
@@ -66,14 +62,8 @@ uploadArchives {
 			pom.artifactId = 'bencoder'
 			configuration = configurations.archives
 
-			def isReleaseVersion = !version.endsWith("-SNAPSHOT")
-			if (isReleaseVersion) {
-				repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-					authentication(userName: nexusUsername, password: nexusPassword)
-				}
-			} else {
-				repository(url: "file://localhost/tmp/myRepo/")
-			}
+			repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: nexusUsername, password: nexusPassword)
 
 			pom.project {
 				url 'http://github.com/tobias-/bencode'
