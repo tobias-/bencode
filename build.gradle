@@ -36,6 +36,10 @@ sourceSets {
     }
 }
 
+task confirmReleaseVersion << {
+	println "confirmReleaseVersion: ${version}"
+}
+
 release {
 	tagPrefix = 'bencoder'
 }
