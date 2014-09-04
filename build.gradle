@@ -50,58 +50,62 @@ buildscript {
     repositories {
         mavenCentral()
     }
+	println "buildscript: " + version
 }
 
 uploadArchives {
-	repositories.mavenDeployer {
-		pom.artifactId = 'bencoder'
-		configuration = configurations.archives
+	println "uploadArchives: " + version
+	repositories {
+		println "repositories: " + version
+		mavenDeployer {
+			println "mavenDeployer: " + version
+			pom.artifactId = 'bencoder'
+			configuration = configurations.archives
 
-		println pom
-		println version
-		def isReleaseVersion = !version.endsWith("-SNAPSHOT")
-		if (isReleaseVersion) {
-			repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-				authentication(userName: nexusUsername, password: nexusPassword)
-			}
-		} else {
-        	repository(url: "file://localhost/tmp/myRepo/")
-		}
-
-		pom.project {
-			url 'http://github.com/tobias-/bencode'
-			inceptionYear '2003'
-			name 'Bencoder'
-			description project.description
-
-			scm {
-				url 'scm:git:https://github.com/tobias-/bencode.git'
-				connection 'scm:git:ssh://git@github.com/tobias-/bencode.git'
+			def isReleaseVersion = !version.endsWith("-SNAPSHOT")
+			if (isReleaseVersion) {
+				repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+					authentication(userName: nexusUsername, password: nexusPassword)
+				}
+			} else {
+				repository(url: "file://localhost/tmp/myRepo/")
 			}
 
-			licenses {
-				license {
-					name 'Unlicense'
-					comments new File('UNLICENSE').getText()
-					url 'http://unlicense.org/'
-					distribution 'repo'
+			pom.project {
+				url 'http://github.com/tobias-/bencode'
+				inceptionYear '2003'
+				name 'Bencoder'
+				description project.description
+
+				scm {
+					url 'scm:git:https://github.com/tobias-/bencode.git'
+					connection 'scm:git:ssh://git@github.com/tobias-/bencode.git'
+				}
+
+				licenses {
+					license {
+						name 'Unlicense'
+						comments new File('UNLICENSE').getText()
+						url 'http://unlicense.org/'
+						distribution 'repo'
+					}
+				}
+				developers {
+					developer {
+						id 'tobias-'
+						name 'Tobias Olsson'
+						email 'tobias@olsson.be'
+					}
 				}
 			}
-			developers {
-				developer {
-					id 'tobias-'
-					name 'Tobias Olsson'
-					email 'tobias@olsson.be'
-				}
+			pom.withXml { root ->
+				def children = root.asNode().children()
+				def versionIndex = children.indexOf(children.find {it.name().localPart == 'version'})
+				children.add(versionIndex + 1, new Node(null, 'packaging', 'jar'))
 			}
+			pom.packaging = 'jar'
+			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 		}
-		pom.withXml { root ->
-			def children = root.asNode().children()
-			def versionIndex = children.indexOf(children.find {it.name().localPart == 'version'})
-			children.add(versionIndex + 1, new Node(null, 'packaging', 'jar'))
-		}
-		pom.packaging = 'jar'
-		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 	}
 }
 
