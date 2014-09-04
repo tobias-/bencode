@@ -7,7 +7,6 @@ apply from: 'http://tellurianring.com/projects/gradle-plugins/gradle-release/app
 
 group = 'be.olsson.bencoder'
 
-ext.isReleaseVersion = !version.endsWith("-SNAPSHOT")
 
 description = "Small library to decode and encode bencoded data"
 
@@ -38,8 +37,9 @@ sourceSets {
 }
 
 release {
-	tagPrefix = 'bencoder-'
+	tagPrefix = 'bencoder'
 }
+
 createReleaseTag.dependsOn uploadArchives
 
 signing {
@@ -57,6 +57,7 @@ uploadArchives {
 		pom.artifactId = 'bencoder'
 		configuration = configurations.archives
 
+		def isReleaseVersion = !version.endsWith("-SNAPSHOT")
 		if (isReleaseVersion) {
 			repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
 				authentication(userName: nexusUsername, password: nexusPassword)
