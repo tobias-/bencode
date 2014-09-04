@@ -57,6 +57,8 @@ uploadArchives {
 		pom.artifactId = 'bencoder'
 		configuration = configurations.archives
 
+		println pom
+		println version
 		def isReleaseVersion = !version.endsWith("-SNAPSHOT")
 		if (isReleaseVersion) {
 			repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/") {
