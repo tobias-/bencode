@@ -37,6 +37,11 @@ sourceSets {
     }
 }
 
+release {
+	tagPrefix = 'bencoder-'
+}
+createReleaseTag.dependsOn uploadArchives
+
 signing {
 	sign configurations.archives
 }
