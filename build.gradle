@@ -64,7 +64,7 @@ uploadArchives {
 
 			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
 				authentication(userName: nexusUsername, password: nexusPassword)
-
+			}
 			pom.project {
 				url 'http://github.com/tobias-/bencode'
 				inceptionYear '2003'
