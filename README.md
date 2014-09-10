@@ -7,7 +7,9 @@ Usage
 =====
 
 The groovy files are just copies of the java files, so either copy the files, use grape
-```@Grab('be.olsson.bencoder:bencoder:0.14')```
+```
+@Grab('be.olsson.bencoder:bencoder:0.14')
+```
 
 or any other framework here:
 http://search.maven.org/#artifactdetails%7Cbe.olsson.bencoder%7Cbencoder%7C0.14%7Cjar
